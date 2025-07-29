@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kasir CT Catering</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#d32f2f">
+  <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar-top">
+    <div class="brand">🍽️ <span>CT Catering</span></div>
+  </header>
+  <div class="notification success">
+    <span>Data berhasil disimpan!</span>
+    <button onclick="this.parentElement.style.display='none'">×</button>
+  </div>
+
+  <nav class="navbar-bottom">
+    <button class="nav-link" onclick="showSection('barang')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" height="20" stroke-width="2">
+        <path d="M4 10a8 8 0 0 0 16 0H4z"/>
+        <path d="M12 18v3m-4 0h8"/>
+      </svg>
+      <span>Makanan</span>
+    </button>
+    <button class="nav-link" onclick="showSection('pembeli')">
+      <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M20 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M4 21v-2a4 4 0 0 1 3-3.87"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>Pembeli</span>
+    </button>
+    <button class="nav-link" onclick="showSection('riwayat')">
+    <svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path d="M4 19v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"></path>
+      <rect x="3" y="3" width="18" height="4" rx="2"></rect>
+      <path d="M8 10v4"></path>
+      <path d="M16 10v4"></path>
+    </svg>
+    <span>Riwayat</span>
+  </button>
+  </nav>
+
+  <main>
+    <!-- SECTION BARANG -->
+    <div id="barang" class="section">
+      <h2>Input Menu Makanan</h2>
+      <form id="item-form" class="form">
+        <label for="item-name">Nama Makanan</label>
+        <input type="text" id="item-name" required>
+
+        <label for="item-price">Harga</label>
+        <input type="number" id="item-price" required>
+
+        <label for="item-qty">Jumlah Stok</label>
+        <input type="number" id="item-qty" required>
+
+        <button type="submit" class="btn">Tambah</button>
+      </form>
+
+      <h3>Daftar Barang</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th><th>Nama</th><th>Harga</th><th>Stok</th><th>Subtotal</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="item-table-body"></tbody>
+        </table>
+      </div>
+      <p><strong>Total:</strong> <span id="grand-total">Rp 0</span></p>
+      <button id="reset-all-btn" class="btn reset">Reset Semua Barang</button>
+    </div>
+
+    <!-- SECTION PEMBELI -->
+    <div id="pembeli" class="section" style="display: none;">
+      <h2>Input Pembeli</h2>
+      <form id="buyer-form" class="form">
+        <label for="nama-pembeli">Nama Pembeli</label>
+        <input type="text" id="nama-pembeli" required>
+
+        <label for="tanggal-transaksi">Tanggal Transaksi</label>
+        <input type="date" id="tanggal-transaksi" required>
+
+        <label for="select-barang">Pilih Barang</label>
+        <select id="select-barang"></select>
+
+        <label for="jumlah-barang">Jumlah</label>
+        <input type="number" id="jumlah-barang" required min="1" value="1">
+
+        <label for="catatan-pembeli">Catatan</label>
+        <input type="text" id="catatan-pembeli">
+
+        <button type="button" id="tambah-ke-keranjang" class="btn">Tambah ke Keranjang</button>
+      </form>
+
+      <div class="keranjang-wrapper">
+        <h3>Keranjang Belanja</h3>
+        <ul id="keranjang-items"></ul>
+        <button id="simpan-transaksi" class="btn">Simpan Transaksi</button>
+      </div>
+
+      <!-- Filter Section -->
+      <!-- <div class="filter-section">
+        <div>
+          <label for="filter-tanggal">Tanggal</label>
+          <input type="date" id="filter-tanggal">
+        </div>
+        <div>
+          <label for="filter-transfer">Transfer</label>
+          <select id="filter-transfer">
+            <option value="">Semua</option>
+            <option value="true">Sudah</option>
+            <option value="false">Belum</option>
+          </select>
+        </div>
+        <div>
+          <label for="filter-kirim">Kirim</label>
+          <select id="filter-kirim">
+            <option value="">Semua</option>
+            <option value="true">Sudah</option>
+            <option value="false">Belum</option>
+          </select>
+        </div>
+      </div> -->
+
+      <!-- <h3>Daftar Transaksi Pembeli</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Nama</th>
+              <th>Barang</th>
+              <th>Jumlah</th>
+              <th>Catatan</th>
+              <th>Total</th>
+              <th>Transfer</th>
+              <th>Gosend</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="buyer-table-body"></tbody>
+        </table>
+      </div>
+      <button id="reset-buyer-btn" class="btn reset">Reset Semua Transaksi</button> -->
+
+      <!-- <div class="menu-summary card">
+        <h3>Total Pesanan per Menu</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Menu</th>
+              <th>Total Pesanan</th>
+            </tr>
+          </thead>
+          <tbody id="menu-summary-body"></tbody>
+        </table>
+      </div>
+
+      <div class="rekap-penjualan card">
+        <h3>Rekap Penjualan</h3>
+        <div class="rekap-grid">
+          <div class="rekap-item">
+            <span class="label">Total Pembeli:</span>
+            <span id="rekap-total-pembeli">0</span>
+          </div>
+          <div class="rekap-item">
+            <span class="label">Total Barang Terjual:</span>
+            <span id="rekap-total-barang">0</span>
+          </div>
+          <div class="rekap-item">
+            <span class="label">Pendapatan (Sudah Transfer):</span>
+            <span id="rekap-total-uang">Rp 0</span>
+          </div>
+          <div class="rekap-item">
+            <span class="label">Transaksi Dikirim:</span>
+            <span id="rekap-total-kirim">0</span>
+          </div>
+        </div>
+      </div> -->
+    </div>
+        <!-- Tambahkan Section Baru di Main -->
+    <div id="riwayat" class="section" style="display: none;">
+      <h2>Riwayat Transaksi
+        <button id="sort-toggle" class="btn small">🔽 Urutkan A-Z</button>
+      </h2>
+      
+      <!-- Filter Section (Pindahkan dari section pembeli) -->
+      <div class="filter-section">
+        <div>
+          <label for="filter-tanggal">Tanggal</label>
+          <input type="date" id="filter-tanggal">
+        </div>
+        <div>
+          <label for="filter-transfer">Transfer</label>
+          <select id="filter-transfer">
+            <option value="">Semua</option>
+            <option value="true">Sudah</option>
+            <option value="false">Belum</option>
+          </select>
+        </div>
+        <div>
+          <label for="filter-kirim">Kirim</label>
+          <select id="filter-kirim">
+            <option value="">Semua</option>
+            <option value="true">Sudah</option>
+            <option value="false">Belum</option>
+          </select>
+        </div>
+        <div>
+          <label for="filter-nama">Cari Nama</label>
+          <input type="text" id="filter-nama" placeholder="Nama pembeli">
+        </div>
+        <div>
+          <label for="filter-barang">Cari Barang</label>
+          <input type="text" id="filter-barang" placeholder="Nama makanan">
+        </div>
+      </div>
+
+      <!-- Tabel Transaksi (Pindahkan dari section pembeli) -->
+      <button id="export-excel" class="btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8.5 6.5a.5.5 0 0 0-1 0v3.793L6.354 9.146a.5.5 0 1 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 10.293V6.5z"/>
+        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+      </svg>
+      Export Excel
+      </button>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Nama</th>
+              <th>Barang</th>
+              <th>Catatan</th>
+              <th>Total</th>
+              <th>Transfer</th>
+              <th>Gosend</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="buyer-table-body"></tbody>
+        </table>
+      </div>
+      <button id="reset-buyer-btn" class="btn reset">Reset Semua Transaksi</button>
+      <div class="menu-summary card">
+        <h3>Total Pesanan per Menu</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Menu</th>
+              <th>Total Pesanan</th>
+            </tr>
+          </thead>
+          <tbody id="menu-summary-body"></tbody>
+        </table>
+      </div>
+
+      <div class="rekap-penjualan card">
+        <h3>Rekap Penjualan</h3>
+        <div class="rekap-grid">
+          <div class="rekap-item">
+            <span class="label">Total Pembeli:</span>
+            <span id="rekap-total-pembeli">0</span>
+          </div>
+          <div class="rekap-item">
+            <span class="label">Total Barang Terjual:</span>
+            <span id="rekap-total-barang">0</span>
+          </div>
+          <div class="rekap-item">
+            <span class="label">Pendapatan (Sudah Transfer):</span>
+            <span id="rekap-total-uang">Rp 0</span>
+          </div>
+          <div class="rekap-item">
+            <span class="label">Transaksi Dikirim:</span>
+            <span id="rekap-total-kirim">0</span>
+          </div>
+        </div>
+      </div>
+  </main>
+
+  <canvas id="struk-canvas" width="300" height="400" style="display: none;"></canvas>
+  <script src="app.js"></script>
+</body>
+</html>
